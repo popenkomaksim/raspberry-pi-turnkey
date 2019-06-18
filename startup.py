@@ -55,8 +55,7 @@ update_config=1
 
 @app.route('/')
 def main():
-    piid = open('pi.id', 'r').read().strip()
-    return render_template('index.html', ssids=getssid(), message="Once connected you'll find IP address @ <a href='https://snaptext.live/{}' target='_blank'>snaptext.live/{}</a>.".format(piid,piid))
+    return render_template('index.html', ssids=getssid())
 
 # Captive portal when connected with iOS or Android
 @app.route('/generate_204')
@@ -142,7 +141,6 @@ def send_static(path):
 
 @app.route('/signin', methods=['POST'])
 def signin():
-    email = request.form['email']
     ssid = request.form['ssid']
     password = request.form['password']
 
@@ -150,7 +148,7 @@ def signin():
     if password == "":
         pwd = "key_mgmt=NONE" # If open AP
 
-    print(email, ssid, password)
+    print(ssid, password)
     valid_psk = check_cred(ssid, password)
     if not valid_psk:
         # User will not see this because they will be disconnected but we need to break here anyway
@@ -161,8 +159,7 @@ def signin():
     with open('status.json', 'w') as f:
         f.write(json.dumps({'status':'disconnected'}))
     subprocess.Popen(["./disable_ap.sh"])
-    piid = open('pi.id', 'r').read().strip()
-    return render_template('index.html', message="Please wait 2 minutes to connect. Then your IP address will show up at <a href='https://snaptext.live/{}'>snaptext.live/{}</a>.".format(piid,piid))
+    return render_template('index.html', message="Please wait 2 minutes to connect.")
 
 def wificonnected():
     result = subprocess.check_output(['iwconfig', 'wlan0'])
@@ -173,15 +170,6 @@ def wificonnected():
     return False
 
 if __name__ == "__main__":
-    # things to run the first time it boots
-    if not os.path.isfile('pi.id'):
-        with open('pi.id', 'w') as f:
-            f.write(id_generator())
-        subprocess.Popen("./expand_filesystem.sh")
-        time.sleep(300)
-    piid = open('pi.id', 'r').read().strip()
-    print(piid)
-    time.sleep(15)
     # get status
     s = {'status':'disconnected'}
     if not os.path.isfile('status.json'):
@@ -207,19 +195,6 @@ if __name__ == "__main__":
             f.write(wpa_conf_default)
         subprocess.Popen("./enable_ap.sh")
     elif s['status'] == 'connected':
-        piid = open('pi.id', 'r').read().strip()
-
-        # get ip address
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("8.8.8.8", 80))
-        ipaddress = s.getsockname()[0]
-        s.close()
-
-        # alert user on snaptext
-        r = requests.post("https://snaptext.live",data=json.dumps({"message":"Your Pi is online at {}".format(ipaddress),"to":piid,"from":"Raspberry Pi Turnkey"}))
-        print(r.json())
-        subprocess.Popen("./startup.sh")
-        while True:
-            time.sleep(60000)
+        pass
     else:
         app.run(host="0.0.0.0", port=80, threaded=True)
