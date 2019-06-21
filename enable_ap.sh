@@ -7,6 +7,9 @@ sudo cp config/hostapd /etc/default/hostapd
 sudo cp config/dhcpcd.conf /etc/dhcpcd.conf
 sudo cp config/dnsmasq.conf /etc/dnsmasq.conf
 
+sudo systemctl enable hostapd
+sudo systemctl start hostapd
+
 # load wan configuration
 sudo cp wpa.conf /etc/wpa_supplicant/wpa_supplicant.conf
 

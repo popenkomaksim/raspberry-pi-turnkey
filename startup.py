@@ -158,7 +158,12 @@ def signin():
         f.write(wpa_conf % (ssid, pwd))
     with open('status.json', 'w') as f:
         f.write(json.dumps({'status':'disconnected'}))
-    subprocess.Popen(["./disable_ap.sh"])
+    print("Disabling access point")
+    fullPath = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'disable_ap.sh')
+    try:
+        print(subprocess.check_output(fullPath, shell=True, stderr=subprocess.STDOUT, cwd=os.path.dirname(os.path.realpath(__file__))))
+    except subprocess.CalledProcessError as callEx:
+        print("Error disabling access point: " + callEx.output.decode("utf-8"))
     return render_template('index.html', message="Please wait 2 minutes to connect.")
 
 def wificonnected():
@@ -193,8 +198,16 @@ if __name__ == "__main__":
             f.write(json.dumps(s))
         with open('wpa.conf', 'w') as f:
             f.write(wpa_conf_default)
-        subprocess.Popen("./enable_ap.sh")
+        print("Enabling access point")
+        fullPath = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'enable_ap.sh')
+        try:
+            print(subprocess.check_output(fullPath, shell=True, stderr=subprocess.STDOUT, cwd=os.path.dirname(os.path.realpath(__file__))))
+        except subprocess.CalledProcessError as callEx:
+            print("Error enabling access point: " + callEx.output.decode("utf-8"))
+
     elif s['status'] == 'connected':
+        print("Connected to WiFi - no access point needed")
         pass
     else:
+        print("Running turnkey portal")
         app.run(host="0.0.0.0", port=80, threaded=True)

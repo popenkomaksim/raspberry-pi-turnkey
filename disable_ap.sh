@@ -7,6 +7,9 @@ sudo cp config/hostapd.disabled /etc/default/hostapd
 sudo cp config/dhcpcd.conf.disabled /etc/dhcpcd.conf
 sudo cp config/dnsmasq.conf.disabled /etc/dnsmasq.conf
 
+sudo systemctl stop hostapd
+sudo systemctl disable hostapd
+
 # load wlan configuration
 sudo cp wpa.conf /etc/wpa_supplicant/wpa_supplicant.conf
 
