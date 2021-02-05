@@ -6,7 +6,6 @@ import re
 import json
 import time
 import os
-from typing import OrderedDict
 from wpasupplicantconf import WpaSupplicantConf
 
 from flask import Flask, request, send_from_directory, render_template, redirect
