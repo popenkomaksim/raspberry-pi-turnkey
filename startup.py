@@ -6,10 +6,10 @@ import re
 import json
 import time
 import os
-import socket
-import requests
+from typing import OrderedDict
+from wpasupplicantconf import WpaSupplicantConf
 
-from flask import Flask, request, send_from_directory, jsonify, render_template, redirect
+from flask import Flask, request, send_from_directory, render_template, redirect
 app = Flask(__name__, static_url_path='')
 
 currentdir = os.path.dirname(os.path.abspath(__file__))
@@ -37,21 +37,6 @@ def getssid():
 
 def id_generator(size=6, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
-
-wpa_conf = """country=GB
-ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
-update_config=1
-network={
-    ssid="%s"
-    %s
-}"""
-
-wpa_conf_default = """country=GB
-ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
-update_config=1
-"""
-
-
 
 @app.route('/')
 def main():
@@ -154,8 +139,8 @@ def signin():
         # User will not see this because they will be disconnected but we need to break here anyway
         return render_template('ap.html', message="Wrong password!")
 
-    with open('wpa.conf', 'w') as f:
-        f.write(wpa_conf % (ssid, pwd))
+    updateNetwork(ssid, pwd)
+
     with open('status.json', 'w') as f:
         f.write(json.dumps({'status':'disconnected'}))
     print("Disabling access point")
@@ -173,6 +158,17 @@ def wificonnected():
         print("got connected to " + matches[0])
         return True
     return False
+
+def updateNetwork(ssid, pwd):
+    lines = []
+    with open('/etc/wpa_supplicant/wpa_supplicant.conf', 'r') as supplicantFile:
+        lines = supplicantFile.readlines()
+    supplicantReader = WpaSupplicantConf(lines)
+    if (ssid in supplicantReader.networks()):
+        supplicantReader.remove_network(ssid)
+    supplicantReader.add_network(ssid, psk="\"{}\"".format(pwd))
+    with open ('/etc/wpa_supplicant/wpa_supplicant.conf', 'w') as supplicantFile:
+        supplicantReader.write(supplicantFile)
 
 if __name__ == "__main__":
     # get status
@@ -196,8 +192,7 @@ if __name__ == "__main__":
         s['status'] = 'hostapd'
         with open('status.json', 'w') as f:
             f.write(json.dumps(s))
-        with open('wpa.conf', 'w') as f:
-            f.write(wpa_conf_default)
+        
         print("Enabling access point")
         fullPath = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'enable_ap.sh')
         try:

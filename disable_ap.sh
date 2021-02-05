@@ -10,7 +10,4 @@ sudo cp config/dnsmasq.conf.disabled /etc/dnsmasq.conf
 sudo systemctl stop hostapd
 sudo systemctl disable hostapd
 
-# load wlan configuration
-sudo cp wpa.conf /etc/wpa_supplicant/wpa_supplicant.conf
-
 sudo reboot now
