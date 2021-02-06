@@ -1,4 +1,5 @@
 import subprocess
+import shutil
 import signal
 import string
 import random
@@ -7,6 +8,9 @@ import json
 import time
 import os
 from wpasupplicantconf import WpaSupplicantConf
+
+WPA_SUPPLICANT_CONF_PATH = '/etc/wpa_supplicant/wpa_supplicant.conf'
+WPA_SUPPLIANT_CONF_BACKUP_PATH = '/etc/wpa_supplicant/wpa_supplicant.bak'
 
 from flask import Flask, request, send_from_directory, render_template, redirect
 app = Flask(__name__, static_url_path='')
@@ -128,17 +132,13 @@ def signin():
     ssid = request.form['ssid']
     password = request.form['password']
 
-    pwd = 'psk="' + password + '"'
-    if password == "":
-        pwd = "key_mgmt=NONE" # If open AP
-
     print(ssid, password)
     valid_psk = check_cred(ssid, password)
     if not valid_psk:
         # User will not see this because they will be disconnected but we need to break here anyway
         return render_template('ap.html', message="Wrong password!")
 
-    updateNetwork(ssid, pwd)
+    restoreFromBackupAndUpdateNetwork(ssid, password)
 
     with open('status.json', 'w') as f:
         f.write(json.dumps({'status':'disconnected'}))
@@ -158,15 +158,33 @@ def wificonnected():
         return True
     return False
 
-def updateNetwork(ssid, pwd):
+def restoreFromBackupAndUpdateNetwork(ssid, pwd):
+    if os.path.exists(WPA_SUPPLIANT_CONF_BACKUP_PATH):
+        shutil.copy2(WPA_SUPPLIANT_CONF_BACKUP_PATH, WPA_SUPPLICANT_CONF_PATH)
+    
     lines = []
-    with open('/etc/wpa_supplicant/wpa_supplicant.conf', 'r') as supplicantFile:
+    with open(WPA_SUPPLICANT_CONF_PATH, 'r') as supplicantFile:
         lines = supplicantFile.readlines()
     supplicantReader = WpaSupplicantConf(lines)
     if (ssid in supplicantReader.networks()):
         supplicantReader.remove_network(ssid)
-    supplicantReader.add_network(ssid, psk="\"{}\"".format(pwd))
-    with open ('/etc/wpa_supplicant/wpa_supplicant.conf', 'w') as supplicantFile:
+    if pwd == "":
+        supplicantReader.add_network(ssid, key_mgmt="NONE")
+    else:
+        supplicantReader.add_network(ssid, psk="\"{}\"".format(pwd))
+    with open (WPA_SUPPLICANT_CONF_PATH, 'w') as supplicantFile:
+        supplicantReader.write(supplicantFile)
+
+def backupAndEmptySupplicantConf():
+    shutil.copy2(WPA_SUPPLICANT_CONF_PATH, WPA_SUPPLIANT_CONF_BACKUP_PATH)
+    lines = []
+    with open(WPA_SUPPLICANT_CONF_PATH, 'r') as supplicantFile:
+        lines = supplicantFile.readlines()
+    supplicantReader = WpaSupplicantConf(lines)
+
+    for network in list(supplicantReader.networks().keys()):
+        supplicantReader.remove_network(network)
+    with open (WPA_SUPPLICANT_CONF_PATH, 'w') as supplicantFile:
         supplicantReader.write(supplicantFile)
 
 if __name__ == "__main__":
@@ -193,6 +211,7 @@ if __name__ == "__main__":
             f.write(json.dumps(s))
         
         print("Enabling access point")
+        backupAndEmptySupplicantConf()
         fullPath = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'enable_ap.sh')
         try:
             print(subprocess.check_output(fullPath, shell=True, stderr=subprocess.STDOUT, cwd=os.path.dirname(os.path.realpath(__file__))))
