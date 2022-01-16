@@ -151,7 +151,6 @@ def signin():
     return render_template('index.html', message="Please wait 2 minutes to connect.")
 
 def wificonnected():
-    time.sleep(10)
     result = subprocess.check_output(['iwconfig', 'wlan0'])
     matches = re.findall(r'\"(.+?)\"', result.split(b'\n')[0].decode('utf-8'))
     if len(matches) > 0:
