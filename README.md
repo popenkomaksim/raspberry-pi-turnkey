@@ -59,7 +59,9 @@ SSH into your Pi using Ethernet, as you will have to disable the WiFi connection
 ```
 $ sudo apt-get update
 $ sudo apt-get dist-upgrade -y
-$ sudo apt-get install -y dnsmasq hostapd vim python3-flask python3-requests git nodejs npm
+$ sudo apt-get install -y dnsmasq hostapd vim python3-flask python3-requests git pip
+
+$ sudo -H pip install wpasupplicantconf
 ```
 
 ### Install node (optional)
