@@ -92,6 +92,10 @@ $ source ~/.profile
 
 ```
 $ git clone https://github.com/popenkomaksim/raspberry-pi-turnkey.git
+
+$ sudo cp ./raspberry-pi-turnkey/turnkey.service /etc/systemd/system/turnkey.service
+$ systemctl start turnkey
+$ systemctl enable turnkey
 ```
 
 ### Add `pi` to sudoers
