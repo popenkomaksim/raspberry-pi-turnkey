@@ -156,7 +156,7 @@ rsn_pairwise=CCMP' | sudo tee --append /etc/hostapd/hostapd.conf
 
 $ echo 'DAEMON_CONF="/etc/hostapd/hostapd.conf"' | sudo tee --append /etc/default/hostapd
 
-$ sudo systemctl start hostapd && sudo systemctl start dnsmasq
+$ sudo systemctl unmask hostapd && sudo systemctl unmask dnsmasq && sudo systemctl start hostapd && sudo systemctl start dnsmasq
 ```
 
 
