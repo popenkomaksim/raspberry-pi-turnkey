@@ -21,7 +21,7 @@
       <div class="text-center mb-4">
 <!--         <img class="mb-4" src="https://getbootstrap.com/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72">
  -->
-       <h1 class="h3 mb-3 font-weight-normal">Sign in</h1>
+       <h1 class="h3 mb-3 font-weight-normal">Підключення до WIFI</h1>
         {% if message %}<p>{{ message|safe }}</p>{% endif %}
       </div>
 
@@ -35,12 +35,10 @@
       </div>
 
       <div class="form-label-group">
-        <input id="inputPassword" autocorrect="off" autocapitalize="none" pattern=".{0}|.{8,}" name="password" class="form-control" placeholder="SSID Password" required>
-        <label for="inputPassword">Password</label>
+        <input id="inputPassword" autocorrect="off" autocapitalize="none" pattern=".{0}|.{8,}" name="password" class="form-control" placeholder="SSID Пароль" required>
+        <label for="inputPassword">Пароль</label>
       </div>
 
-      <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-      <p class="mt-5 mb-3 text-muted text-center"><a href="https://github.com/nikivanov/watney">Watney Rover</a></p>
-      <p class="mt-5 mb-3 text-muted text-center"><a href="https://github.com/schollz/raspberry-pi-turnkey">Raspberry Pi Turnkey</a></p>
+      <button class="btn btn-lg btn-primary btn-block" type="submit">Підключитися</button>
     </form>
   </body>
