@@ -150,11 +150,7 @@ wmm_enabled=0
 macaddr_acl=0
 auth_algs=1
 ignore_broadcast_ssid=0
-wpa=2
-wpa_passphrase=ConnectToConnect
-wpa_key_mgmt=WPA-PSK
-wpa_pairwise=TKIP
-rsn_pairwise=CCMP' | sudo tee --append /etc/hostapd/hostapd.conf
+wpa=0' | sudo tee --append /etc/hostapd/hostapd.conf
 
 $ echo 'DAEMON_CONF="/etc/hostapd/hostapd.conf"' | sudo tee --append /etc/default/hostapd
 
