@@ -34,21 +34,6 @@ The following are the step-by-step instructions for how I create the turnkey ima
 
 These instructions assume you are using Ubuntu. You can use Windows/OS X for most of these steps, except step #4 which requires resizing.
 
-## 1. Flash Raspbian Stretch Lite
-
-Starting from version [Raspbian Stretch Lite](https://www.raspberrypi.org/downloads/raspbian/) version 2017-11-29.
-
-```
-$ sudo dd bs=4M if=2017-11-29-raspbian-stretch-lite.img of=/dev/mmcblk0 conv=fsync status=progress
-```
-
-Change `/dev/mmcblk0` to whatever your SD card is (find it using `fdisk -l`).
-
-After flashing, for the first time use, just plug in ethernet and you can SSH into the Pi. To activate SSH on boot just do
-
-```
-$ touch /media/YOURUSER/boot/ssh
-```
 
 ## 2. Install libraries onto the Raspberry Pi
 
@@ -62,30 +47,6 @@ $ sudo apt-get dist-upgrade -y
 $ sudo apt-get install -y dnsmasq hostapd vim python3-flask python3-requests git pip
 
 $ sudo -H pip install wpasupplicantconf
-```
-
-### Install node (optional)
-
-```
-$ wget https://nodejs.org/dist/v8.9.4/node-v8.9.4-linux-armv6l.tar.xz
-$ sudo mkdir /usr/lib/nodejs
-$ sudo tar -xJvf node-v8.9.4-linux-armv6l.tar.xz -C /usr/lib/nodejs 
-$ rm -rf node-v8.9.4-linux-armv6l.tar.xz
-$ sudo mv /usr/lib/nodejs/node-v8.9.4-linux-armv6l /usr/lib/nodejs/node-v8.9.4
-$ echo 'export NODEJS_HOME=/usr/lib/nodejs/node-v8.9.4' >> ~/.profile
-$ echo 'export PATH=$NODEJS_HOME/bin:$PATH' >> ~/.profile
-$ source ~/.profile
-```
-
-### Install Go (optional)
-
-```
-$ wget https://dl.google.com/go/go1.10.linux-armv6l.tar.gz
-$ sudo tar -C /usr/local -xzf go*gz
-$ rm go*gz
-$ echo 'export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin' >>  ~/.profile
-$ echo 'export GOPATH=$HOME/go' >>  ~/.profile
-$ source ~/.profile
 ```
 
 ### Install turnkey
@@ -114,20 +75,6 @@ pi      ALL=(ALL:ALL) ALL
 
 (_Sidenote:_ I save an image `intermediate.img` at this point so its easy to go back)
 
-
-### Startup server on boot
-
-Open up the `rc.local`
-
-```
-$ sudo nano /etc/rc.local
-```
-
-And add the following line before `exit 0`:
-
-```
-su pi -c '/usr/bin/sudo /usr/bin/python3 /home/pi/raspberry-pi-turnkey/startup.py &'
-```
 
 
 ### Install Hostapd
@@ -173,6 +120,7 @@ $ sudo shutdown now
 ## 3. Resize Raspberry Pi SD image
 
 
+These instructions assume you are using Ubuntu. You can use Windows/OS X for most of these steps, except step #4 which requires resizing.
 
 If you don't want to resize the image, you can just write the entire image file to your computer and use that from here on. If you do want to resize (especially useful if you are installing on a 16GB card and want to flash onto a smaller card), follow these instructions.
 
@@ -201,13 +149,6 @@ The new image will be in `/some/place/2018-turnkey.img` which you can use to fla
 $ sudo dd bs=4M if=/some/place/turnkey.img of=/dev/mmcblk0 conv=fsync status=progress
 ```
 
-# Roadmap
-
-- [x] ~~Add messaging system to send the LAN IP address once online~~ (uses https://github.com/schollz/snaptext)
-- [x] ~~Add startup hooks~~ (just edit `startup.sh`)
-- [ ] connect immediately to wifi and disable hostapd without rebooting
-
-If you'd like to contribute, please do send a PR!
 
 # Thanks
 
