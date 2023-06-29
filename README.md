@@ -34,6 +34,7 @@ The following are the step-by-step instructions for how I create the turnkey ima
 
 These instructions assume you are using Ubuntu. You can use Windows/OS X for most of these steps, except step #4 which requires resizing.
 
+[Getting up Pi Zero OTG - The quick way (No USB keyboard, mouse, HDMI monitor needed)](https://gist.github.com/gbaman/975e2db164b3ca2b51ae11e45e8fd40a)
 
 ## 2. Install libraries onto the Raspberry Pi
 
