@@ -4,7 +4,7 @@ After=multi-user.target
 
 [Service]
 Type=idle
-ExecStart=/usr/bin/python3 /home/pi/raspberry-pi-turnkey/startup.py
+ExecStart=/usr/bin/unbuffer /usr/bin/python3 /home/pi/raspberry-pi-turnkey/startup.py
 WorkingDirectory=/home/pi/raspberry-pi-turnkey
 
 [Install]
